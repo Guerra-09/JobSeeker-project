@@ -12,40 +12,123 @@ struct JobOfferHandler: Codable {
     
 }
 
+struct OfferCompanyModel: Codable {
+    let data: String = ""
+    let attributes: String = ""
+    
+    let name: String
+    let logo: String
+    
+    enum CodingKeys: String, CodingKey {
+        case data = "data"
+        case attributes = "attributes"
+        
+        case name = "name"
+        case logo = "logo"
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        let data = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .data)
+        
+        let attributes = try data.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
+        self.name = try attributes.decode(String.self, forKey: .name)
+        self.logo = try attributes.decode(String.self, forKey: .logo)
+        
+    }
+}
+
+struct SeniorityModel: Codable {
+    
+    let data: String = ""
+    let id: Int
+    
+    enum CodingKeys: String, CodingKey {
+        case data = "data"
+        case id = "id"
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        let data = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .data)
+        
+        self.id = try data.decode(Int.self, forKey: .id)
+        
+    }
+
+}
+
+struct Modality: Codable {
+    let data: String = ""
+    let id: Int
+    
+    enum CodingKeys: String, CodingKey {
+        case data = "data"
+        case id = "id"
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let data = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .data)
+        self.id = try data.decode(Int.self, forKey: .id)
+    }
+    
+}
+
 struct JobOfferModel: Codable {
     
     let id: String
-    let type: String
     let attributes: String = ""
     
     // Inside of attributes
     let title: String
     let descriptionHeadline: String
     let description: String
-
+    let remote: Bool
+    let remoteModality: String
+        
+    let seniority: SeniorityModel
+    let company: OfferCompanyModel
+    let modality: Modality
+    
+    
     
     enum CodingKeys: String, CodingKey {
         
         case id = "id"
-        case type = "type"
+        
         case attributes = "attributes"
         
         case title = "title"
         case descriptionHeadline = "description_headline"
         case description = "description"
+        case remote = "remote"
+        case remoteModality = "remote_modality"
+        
+        case seniority = "seniority"
+        case company = "company"
+        case modality = "modality"
+        
     
     }
     
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.id = try container.decode(String.self, forKey: .id)
-        self.type = try container.decode(String.self, forKey: .type)
         
         let attributes = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
         self.title = try attributes.decode(String.self, forKey: .title)
         self.descriptionHeadline = try attributes.decode(String.self, forKey: .descriptionHeadline)
         self.description = try attributes.decode(String.self, forKey: .description)
-
+        self.remote = try attributes.decode(Bool.self, forKey: .remote)
+        self.remoteModality = try attributes.decode(String.self, forKey: .remoteModality)
+        
+        self.seniority = try attributes.decode(SeniorityModel.self, forKey: .seniority)
+        self.company = try attributes.decode(OfferCompanyModel.self, forKey: .company)
+        self.modality = try attributes.decode(Modality.self, forKey: .modality)
+        
     }
     
     

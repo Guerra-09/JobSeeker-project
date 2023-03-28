@@ -8,7 +8,70 @@
 import Foundation
 import UIKit
 
-class OfferViewController: UIViewController {
+class OfferViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return self.offerData?.data.count ?? 0
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let offerDetailVC = OfferDetailsViewController()
+        offerDetailVC.jobInfo = self.offerData?.data[indexPath.row]
+        navigationController?.pushViewController(offerDetailVC, animated: true)
+        
+    }
+    
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: OfferCell.identifier, for: indexPath) as? OfferCell else {
+            fatalError("ERROR: problema con el uitableviewcell")
+        }
+        
+        let offerModel = self.offerData?.data
+        var configuration = UIListContentConfiguration.cell()
+        configuration.text = "\(offerModel?[indexPath.row].title ?? "null")"
+        
+        
+        // This line sets up the seniority level of the offer
+        var seniorityPlaceholder = String()
+        
+        self.offerData?.data.forEach({ index in
+            
+            if index.seniority.id == 1 {
+                seniorityPlaceholder = "Sin Experiencia"
+                
+            } else if index.seniority.id == 2 {
+                seniorityPlaceholder = "Junior"
+                
+            } else if index.seniority.id == 3 {
+                seniorityPlaceholder = "Semi Senior"
+                
+            } else if index.seniority.id == 4 {
+                seniorityPlaceholder = "Senior"
+                
+            } else if index.seniority.id == 5 {
+                seniorityPlaceholder = "Expert"
+                
+            } else {
+                seniorityPlaceholder = "not specified"
+            }
+        })
+        
+        // This line sets up the name of the company
+        
+        
+        configuration.secondaryText = "Seniority: \(seniorityPlaceholder) \n\(self.offerData?.data[indexPath.row].company.name ?? "null")"
+        
+        /// Edit: This is not loading the image
+        configuration.image = downloadImageFromInternet(urlFromInternet: self.offerData?.data[indexPath.row].company.logo ?? "null")
+        
+        cell.contentConfiguration = configuration
+        
+        return cell
+    }
+    
+    
+    
     
     
     // MARK: - Variables
@@ -17,32 +80,17 @@ class OfferViewController: UIViewController {
     private var offerData: JobOfferHandler?
     
     
+    
     // MARK: - Components
     
-    private let offerNameLabel: UILabel = {
-        let label = UILabel()
-        label.font = .boldSystemFont(ofSize: .infinity)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-        
-        
+    private let offerTableView: UITableView = {
+        let tableView = UITableView()
+        tableView.backgroundColor = .systemBackground
+        tableView.allowsSelection = true
+        tableView.register(OfferCell.self, forCellReuseIdentifier: OfferCell.identifier)
+        return tableView
     }()
     
-    
-    private let detailsLabel: UILabel = {
-        let label = UILabel()
-        label.text = "placeholder"
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 0
-        return label
-    }()
-    
-    private let titleLabel: UILabel = {
-        let labelText = UILabel()
-        labelText.text = "placeholder"
-        labelText.translatesAutoresizingMaskIntoConstraints = false
-        return labelText
-    }()
     
     
     // MARK: - LifeCycle
@@ -51,9 +99,14 @@ class OfferViewController: UIViewController {
         super.viewDidLoad()
         
         navigationItem.title = self.offerTitle?.name
-        //titleLabel.text = self.offerTitle?.name
     
         self.loadJobOffers()
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.offerTableView.delegate = self
+            self?.offerTableView.dataSource = self
+        }
+        
      
         
     }
@@ -61,32 +114,19 @@ class OfferViewController: UIViewController {
     
     // MARK: - Setting UP View
     
-    func setUpView(offerInfo: [String]) {
+    func setUpView() {
         
-        view.backgroundColor = UIColor.red
-        view.addSubview(titleLabel)
-        view.addSubview(offerNameLabel)
-        view.addSubview(detailsLabel)
+        //view.backgroundColor = UIColor.red
+        view.addSubview(offerTableView)
         
-        titleLabel.text = offerInfo[0]
-        detailsLabel.text = offerInfo[1]
-
+        offerTableView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            
-            titleLabel.topAnchor.constraint(equalTo: self.view.topAnchor),
-            titleLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
-            titleLabel.bottomAnchor.constraint(equalTo: offerNameLabel.topAnchor),
-            
-            offerNameLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor),
-            offerNameLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
-            offerNameLabel.bottomAnchor.constraint(equalTo: detailsLabel.topAnchor),
-
-            detailsLabel.topAnchor.constraint(equalTo: offerNameLabel.bottomAnchor),
-            detailsLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
-            detailsLabel.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
+            offerTableView.topAnchor.constraint(equalTo: self.view.topAnchor),
+            offerTableView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
+            offerTableView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+            offerTableView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
         ])
-        
         
     }
     
@@ -107,19 +147,47 @@ class OfferViewController: UIViewController {
                 guard let modelGet = model else { return }
                 
                 self.offerData = modelGet
-
-                self.offerData?.data.forEach({
-                    self.setUpView(offerInfo: [$0.title, $0.description])
-                })
+                
+                self.setUpView()
+                
                     return
             }
         }
     }
     
-    
+    func downloadImageFromInternet(urlFromInternet: String) -> UIImage {
+        let url = URL(string: urlFromInternet)!
+        let session = URLSession(configuration: .default)
+        var imageFinal = UIImage()
 
+        
+        let downloadPicTask = session.dataTask(with: url) { (data, response, error) in
+            if let e = error {
+                print("Error downloading picture: \(e)")
+            } else {
+                if let res = response as? HTTPURLResponse {
+                    //print("Downloaded \(urlFromInternet) picture with response code \(res.statusCode)")
+                    if let imageData = data {
+                        imageFinal = UIImage(data: imageData) ?? UIImage()
+                    } else {
+                        print("Couldn't get image: Image is nil")
+                    }
+                } else {
+                    print("Couldn't get response code for some reason")
+                }
+            }
+        }
+
+        downloadPicTask.resume()
+        return imageFinal
+    }
+    
+    
+    
     
 }
+
+
 
 
 

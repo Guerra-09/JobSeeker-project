@@ -33,9 +33,7 @@ class CompanyController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBlue
-        
-        //self.testVariable = ["h", "o", "l", "a"]
-            
+     
         self.loadApi()
         self.setupUI()
         self.tableView.delegate = self

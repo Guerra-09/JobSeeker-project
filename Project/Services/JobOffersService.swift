@@ -14,7 +14,7 @@ class JobOfferService {
     
     func fetchingOffersData(jobId: String ,completionHandler: @escaping (JobOfferHandler?, Error?) -> Void) {
         
-        let url = "https://www.getonbrd.com/api/v0/categories/\(jobId)/jobs?per_page=1&page=1&expand=[%22company%22]"
+        let url = "https://www.getonbrd.com/api/v0/categories/\(jobId)/jobs?per_page=10&page=1&expand=[%22company%22]"
         
         AF.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: nil, interceptor: nil).response { response in
             
