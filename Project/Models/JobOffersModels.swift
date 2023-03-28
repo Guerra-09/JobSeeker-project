@@ -93,11 +93,15 @@ struct JobOfferModel: Codable {
     let company: OfferCompanyModel
     let modality: Modality
     
+    let links: String = ""
+    let publicUrl: String
     
     
     enum CodingKeys: String, CodingKey {
         
         case id = "id"
+        case links = "links"
+        case publicUrl = "public_url"
         
         case attributes = "attributes"
         
@@ -129,6 +133,8 @@ struct JobOfferModel: Codable {
         self.company = try attributes.decode(OfferCompanyModel.self, forKey: .company)
         self.modality = try attributes.decode(Modality.self, forKey: .modality)
         
+        let links = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .links)
+        self.publicUrl = try links.decode(String.self, forKey: .publicUrl)
     }
     
     

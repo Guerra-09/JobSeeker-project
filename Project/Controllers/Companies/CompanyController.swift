@@ -11,8 +11,7 @@ class CompanyController: UIViewController {
     
     // MARK: - Variables
     
-    var companies: [CompanyModel]?
-    var testVariable: [String]?
+    var companies: CompanyHandler?
     
     
     
@@ -26,6 +25,7 @@ class CompanyController: UIViewController {
         return tableView
     }()
     
+
     
     
     // MARK: - LifeCycle
@@ -36,8 +36,11 @@ class CompanyController: UIViewController {
      
         self.loadApi()
         self.setupUI()
+        
+        
         self.tableView.delegate = self
         self.tableView.dataSource = self
+        
     }
     
     
@@ -56,13 +59,9 @@ class CompanyController: UIViewController {
             if let error = error {
                 print(error)
             } else {
-                print("CompanyController: \(model?.data.count ?? 0)")
-                
-            }
-            
-            guard model?.data != nil else {
-                self.companies = model?.data
-                return
+                guard let modelData = model else { return }
+                self.companies = modelData
+                self.tableView.reloadData()
             }
         }
     }
@@ -89,8 +88,7 @@ class CompanyController: UIViewController {
 extension CompanyController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        //return self.companies?.count ?? 3
-        return self.testVariable?.count ?? 1
+        return self.companies?.data.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -98,11 +96,10 @@ extension CompanyController: UITableViewDelegate, UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CompanyCell.identifier, for: indexPath) as? CompanyCell else {
             fatalError("ERROR: problema con el uitableviewcell")
         }
-                
-        cell.textLabel?.text = "testing"
+            
         
-        //cell.textLabel?.text = self.testVariable![indexPath.row]
-        //cell.textLabel?.text = "\(String(describing: self.model?.data[indexPath.row]))"
+        cell.configure(with: "\(self.companies?.data[indexPath.row].logo ?? "bruh")", and: "\(self.companies?.data[indexPath.row].name ?? "null")")
+        
         return cell
     }
 }

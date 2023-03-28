@@ -7,10 +7,12 @@
 
 import Foundation
 import UIKit
+import WebKit
 
-class OfferDetailsViewController: UIViewController {
+class OfferDetailsViewController: UIViewController, UIScrollViewDelegate {
     
     var jobInfo: JobOfferModel?
+
     
     // MARK: -> Components
     
@@ -43,7 +45,7 @@ class OfferDetailsViewController: UIViewController {
     private var descriptionLabel: UILabel = {
        let descriptionLabel = UILabel()
         descriptionLabel.text = "description placeholder"
-        descriptionLabel.numberOfLines = 17
+        descriptionLabel.numberOfLines = 15
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
         return descriptionLabel
     }()
@@ -62,6 +64,15 @@ class OfferDetailsViewController: UIViewController {
         return label
     }()
     
+    private var buttonLink: UIButton = {
+        var btn = UIButton.Configuration.filled()
+        btn.title = "Ver Anuncio"
+        let button = UIButton(type: .system)
+        button.configuration = btn
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(didTapButton), for: .touchUpInside)
+        return button
+    }()
     
     
     // MARK: -> Life Cycle
@@ -70,13 +81,15 @@ class OfferDetailsViewController: UIViewController {
         view.backgroundColor = .white
         
         self.setupUI()
-        
-        
-        
+    
     }
+    
+    
+    // MARK: -> Setting Up View
     
     private func setupUI() {
         
+  
         self.view.addSubview(titleLabel)
         self.view.addSubview(seniorityLabel)
         self.view.addSubview(modalityLabel)
@@ -84,13 +97,14 @@ class OfferDetailsViewController: UIViewController {
         self.view.addSubview(companyLogo)
         self.view.addSubview(companyName)
         self.view.addSubview(descriptionLabel)
+        self.view.addSubview(buttonLink)
     
+        
         // Setting up Title label
         titleLabel.text = self.jobInfo?.title
         if let titleLenght = self.jobInfo?.title.count {
-            titleLabel.font = titleLenght < 22 ? UIFont(name: "HelveticaNeue-Bold", size: 30.0) : UIFont(name: "HelveticaNeue-Bold", size: 18.0)
+            titleLabel.font = titleLenght < 22 ? UIFont(name: "HelveticaNeue-Bold", size: 30.0) : UIFont(name: "HelveticaNeue-Bold", size: 20.0)
         }
-        
 
         
         
@@ -169,11 +183,10 @@ class OfferDetailsViewController: UIViewController {
         
         // Setting up requirements of the job
         descriptionLabel.text = "Requerimientos del cargo:\n\(self.jobInfo?.description.htmlToString ?? "null")"
-        
-
-        
+    
         
         NSLayoutConstraint.activate([
+    
             //Setting up Offer Name constraints
             titleLabel.topAnchor.constraint(equalTo: self.view.layoutMarginsGuide.topAnchor),
             titleLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
@@ -208,12 +221,28 @@ class OfferDetailsViewController: UIViewController {
             descriptionLabel.topAnchor.constraint(equalTo: companyName.bottomAnchor),
             descriptionLabel.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 10),
             descriptionLabel.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -10),
-            descriptionLabel.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
+            descriptionLabel.bottomAnchor.constraint(equalTo: buttonLink.topAnchor),
             
+            buttonLink.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: -30),
+            buttonLink.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
+            buttonLink.bottomAnchor.constraint(equalTo: self.view.layoutMarginsGuide.bottomAnchor, constant: -50),
+            buttonLink.heightAnchor.constraint(equalToConstant: 35),
             
             
             
         ])
+    }
+    
+    
+    @objc private func didTapButton() {
+        guard let url = URL(string: "\(String(describing: self.jobInfo?.publicUrl ?? "https://google.com"))") else {
+            print("link: \(self.jobInfo?.publicUrl)")
+            return
+        }
+        
+        let vc = WebViewViewController(url: url, title: "\(String(describing: self.jobInfo?.publicUrl ?? "https://google.com"))")
+        let navVC = UINavigationController(rootViewController: vc)
+        present(navVC, animated: true)
     }
     
 }
@@ -223,17 +252,22 @@ extension UIImageView {
     
     func load(urlRequest: String) {
         
-        let url = URL(string: urlRequest)
-        
-        DispatchQueue.global().async { [weak self] in
-            if let data = try? Data(contentsOf: url!) {
-                if let image = UIImage(data: data) {
-                    DispatchQueue.main.async {
-                        self?.image = image
+        if let url = URL(string: urlRequest) {
+            
+            DispatchQueue.global().async { [weak self] in
+                if let data = try? Data(contentsOf: url) {
+                    if let image = UIImage(data: data) {
+                        DispatchQueue.main.async {
+                            self?.image = image
+                        }
                     }
                 }
             }
+            
+        } else {
+            print("nil value")
         }
+
     }
 }
 

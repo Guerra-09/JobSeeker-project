@@ -72,7 +72,7 @@ class CategoryController: UIViewController {
             } else {
                 // Running perfectly
             }
-            
+    
             
             guard model == nil else {
                 
