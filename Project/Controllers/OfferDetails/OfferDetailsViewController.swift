@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import WebKit
 
-class OfferDetailsViewController: UIViewController, UIScrollViewDelegate {
+class OfferDetailsViewController: UIViewController {
     
     var jobInfo: JobOfferModel?
 
@@ -236,7 +236,7 @@ class OfferDetailsViewController: UIViewController, UIScrollViewDelegate {
     
     @objc private func didTapButton() {
         guard let url = URL(string: "\(String(describing: self.jobInfo?.publicUrl ?? "https://google.com"))") else {
-            print("link: \(self.jobInfo?.publicUrl)")
+            print("link: \(String(describing: self.jobInfo?.publicUrl))")
             return
         }
         
@@ -271,12 +271,5 @@ extension UIImageView {
     }
 }
 
-extension UIImageView {
 
-   func setRounded() {
-      let radius = CGRectGetWidth(self.frame) / 2
-      self.layer.cornerRadius = radius
-      self.layer.masksToBounds = true
-   }
-}
 

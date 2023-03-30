@@ -1,37 +1,38 @@
 //
-//  ApiService.swift
+//  JobOffersService.swift
 //  Project
 //
-//  Created by José Guerra on 14-03-23.
+//  Created by José Guerra on 22-03-23.
 //
 
 import Foundation
 import Alamofire
 
-class ApiHandler {
+class JobOfferService {
     
-    var categoryDelegate: CategoryControllerProtocol?
+    //private var jobOfferDelegate: CompanyControllerProtocol?
     
-    func fetchingAPIData(completionHandler: @escaping (ModelHandler?, Error?) -> Void) {
-        let url = "https://www.getonbrd.com/api/v0/categories?per_page=10&page=1"
+    func fetchingOffersData(jobId: String ,completionHandler: @escaping (JobOfferHandler?, Error?) -> Void) {
+        
+        let url = "https://www.getonbrd.com/api/v0/categories/\(jobId)/jobs?per_page=25&page=1&expand=[%22company%22]"
         
         AF.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: nil, interceptor: nil).response { response in
             
             switch response.result {
             case .success(let data):
                 do {
-                    let jsondata = try JSONDecoder().decode(ModelHandler.self, from: data!)
-                    //print(jsondata)
+                    let jsondata = try JSONDecoder().decode(JobOfferHandler.self, from: data!)
+                    //print("jobOffers: \(jsondata)")
                     completionHandler(jsondata, nil)
                     
                 } catch {
-                    //print(error.localizedDescription)
+                    print(error.localizedDescription)
                     print(String(describing: error))
                     completionHandler(nil, error)
                 }
             
             case .failure(let error):
-                //print(error.localizedDescription)
+                print(error.localizedDescription)
                 print(String(describing: error))
                 completionHandler(nil, error)
                 
@@ -42,4 +43,3 @@ class ApiHandler {
     
 }
 
-// https://www.getonbrd.com/api/v0/companies?per_page=10&page=1

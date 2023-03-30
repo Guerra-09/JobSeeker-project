@@ -11,11 +11,13 @@ class CategoryController: UIViewController {
     
     // MARK: - Variables
     
-    var model: ModelHandler?
+    private var model: CategoryHandler?
+    private var presenter: CategoryPresenter?
     
     
     
     // MARK: - Components
+
     
     private let tableView: UITableView = {
         let tableView = UITableView()
@@ -30,42 +32,36 @@ class CategoryController: UIViewController {
     
     // MARK: - LifeCycle
     
+    convenience init(presenter: CategoryPresenter? = nil) {
+        self.init()
+        self.presenter = presenter
+        self.presenter?.attach(view: self)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
-        navigationItem.title = "Categories"
-        
         self.loadApi()
         self.setupUI()
-        
-//        DispatchQueue.main.async { [weak self] in
-//
-//            self?.tableView.delegate = self
-//            self?.tableView.dataSource = self
-//        }
-        
         self.tableView.delegate = self
         self.tableView.dataSource = self
-        
-        
-        
-        
-        
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        
+        /// Remember: Esta linea de codigo deseleciona las celdas al carga la view
         if let indexPath = self.tableView.indexPathForSelectedRow {
                  tableView.deselectRow(at: indexPath, animated: true)
             }
+        
     }
     
     // MARK: - Setup UI
     
     private func loadApi() {
-        let presenter = CategoryPresenter(apiService: ApiHandler())
-        presenter.requestData { model, error in
+    
+        let presenter = CategoryPresenter(categoryUseCase: CategoryService())
+        presenter.requestCategories { model, error in
 
             if let error = error {
                 print(error)
@@ -88,7 +84,7 @@ class CategoryController: UIViewController {
     
     private func setupUI() {
         self.view.backgroundColor = .systemBlue
-        
+        self.navigationItem.title = "Categories"
         self.view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -130,12 +126,6 @@ extension CategoryController: UITableViewDelegate, UITableViewDataSource {
     
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        let vc = OfferViewController()
-//        vc.offerTitle = self.model?.data[indexPath.row]
-//        present(vc, animated: true)
-        
-        
-        
         let vc = OfferViewController()
         vc.offerTitle = self.model?.data[indexPath.row]
         navigationController?.pushViewController(vc, animated: true)
@@ -145,4 +135,36 @@ extension CategoryController: UITableViewDelegate, UITableViewDataSource {
     
     
 
+}
+
+
+extension CategoryController: CategoryControllerProtocol {
+    func showList(list: CategoryHandler) {
+        self.model = list
+        
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
+        
+    }
+    
+
+    
+    
+    
+    func showOfferList(model: [JobOfferModel]) {}
+    
+    func showCompanyList(model: [CompanyModel]) {}
+    
+    func errorList() {
+        let alert = UIAlertController(title: "Error", message: "Something went wrong", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: { _ in
+            
+        }))
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    
+    
+    
 }

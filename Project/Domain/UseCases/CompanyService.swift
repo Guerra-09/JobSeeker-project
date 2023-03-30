@@ -1,28 +1,27 @@
 //
-//  JobOffersService.swift
+//  CompanyService.swift
 //  Project
 //
-//  Created by José Guerra on 22-03-23.
+//  Created by José Guerra on 21-03-23.
 //
 
 import Foundation
 import Alamofire
 
-class JobOfferService {
+class CompanyService {
     
-    //private var jobOfferDelegate: CompanyControllerProtocol?
+    //var companyDelegate: CompanyControllerProtocol?
     
-    func fetchingOffersData(jobId: String ,completionHandler: @escaping (JobOfferHandler?, Error?) -> Void) {
-        
-        let url = "https://www.getonbrd.com/api/v0/categories/\(jobId)/jobs?per_page=10&page=1&expand=[%22company%22]"
+    func fetchingAPIData(completionHandler: @escaping (CompanyHandler?, Error?) -> Void) {
+        let url = "https://www.getonbrd.com/api/v0/companies?per_page=20&page=1"
         
         AF.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: nil, interceptor: nil).response { response in
             
             switch response.result {
             case .success(let data):
                 do {
-                    let jsondata = try JSONDecoder().decode(JobOfferHandler.self, from: data!)
-                    //print("jobOffers: \(jsondata)")
+                    let jsondata = try JSONDecoder().decode(CompanyHandler.self, from: data!)
+                    //print("companyService \(jsondata)")
                     completionHandler(jsondata, nil)
                     
                 } catch {

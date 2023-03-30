@@ -7,24 +7,30 @@
 
 import Foundation
 
-class CategoryPresenter {
+final class CategoryPresenter {
     
-    private var apiService: ApiHandler?
+    private weak var view: CategoryControllerProtocol?
+    private var categoryUseCase: CategoryService?
+    private var categoryList: CategoryService?
     
-    init(apiService: ApiHandler? = nil) {
-        self.apiService = apiService
+    init(categoryUseCase: CategoryService? = nil) {
+        self.categoryUseCase = categoryUseCase
     }
     
-    func requestData(completionHandler: @escaping (ModelHandler?, Error?) -> Void) {
+    func attach(view: CategoryControllerProtocol) {
+        self.view = view
+    }
+    
+    func requestCategories(completionHandler: @escaping (CategoryHandler?, Error?) -> Void) {
         
-        apiService?.fetchingAPIData { model, error in
+        categoryUseCase?.fetchCategories { model, error in
             
             if let model = model {
                 completionHandler(model, nil)
+                
             } else {
-               completionHandler(nil, error)
+                completionHandler(nil, error)
             }
-            
         }
     }
 }

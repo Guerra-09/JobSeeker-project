@@ -8,70 +8,7 @@
 import Foundation
 import UIKit
 
-class OfferViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.offerData?.data.count ?? 0
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let offerDetailVC = OfferDetailsViewController()
-        offerDetailVC.jobInfo = self.offerData?.data[indexPath.row]
-        navigationController?.pushViewController(offerDetailVC, animated: true)
-        
-    }
-    
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: OfferCell.identifier, for: indexPath) as? OfferCell else {
-            fatalError("ERROR: problema con el uitableviewcell")
-        }
-        
-        let offerModel = self.offerData?.data
-        var configuration = UIListContentConfiguration.cell()
-        configuration.text = "\(offerModel?[indexPath.row].title ?? "null")"
-        
-        
-        // This line sets up the seniority level of the offer
-        var seniorityPlaceholder = String()
-        
-        self.offerData?.data.forEach({ index in
-            
-            if index.seniority.id == 1 {
-                seniorityPlaceholder = "Sin Experiencia"
-                
-            } else if index.seniority.id == 2 {
-                seniorityPlaceholder = "Junior"
-                
-            } else if index.seniority.id == 3 {
-                seniorityPlaceholder = "Semi Senior"
-                
-            } else if index.seniority.id == 4 {
-                seniorityPlaceholder = "Senior"
-                
-            } else if index.seniority.id == 5 {
-                seniorityPlaceholder = "Expert"
-                
-            } else {
-                seniorityPlaceholder = "not specified"
-            }
-        })
-        
-        // This line sets up the name of the company
-        
-        
-        configuration.secondaryText = "Seniority: \(seniorityPlaceholder) \n\(self.offerData?.data[indexPath.row].company.name ?? "null")"
-        
-        /// Edit: This is not loading the image
-        configuration.image = downloadImageFromInternet(urlFromInternet: self.offerData?.data[indexPath.row].company.logo ?? "null")
-        
-        cell.contentConfiguration = configuration
-        
-        return cell
-    }
-    
-    
-    
+class OfferViewController: UIViewController {
     
     
     // MARK: - Variables
@@ -116,7 +53,6 @@ class OfferViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     func setUpView() {
         
-        //view.backgroundColor = UIColor.red
         view.addSubview(offerTableView)
         
         offerTableView.translatesAutoresizingMaskIntoConstraints = false
@@ -189,5 +125,64 @@ class OfferViewController: UIViewController, UITableViewDelegate, UITableViewDat
 
 
 
+extension OfferViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return self.offerData?.data.count ?? 0
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let offerDetailVC = OfferDetailsViewController()
+        offerDetailVC.jobInfo = self.offerData?.data[indexPath.row]
+        navigationController?.pushViewController(offerDetailVC, animated: true)
+        
+    }
+}
 
 
+extension OfferViewController: UITableViewDataSource {
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: OfferCell.identifier, for: indexPath) as? OfferCell else {
+            fatalError("ERROR: problema con el uitableviewcell")
+        }
+        
+        let offerModel = self.offerData?.data
+        var configuration = UIListContentConfiguration.cell()
+        configuration.text = "\(offerModel?[indexPath.row].title ?? "null")"
+        
+        
+        // This line sets up the seniority level of the offer
+        var seniorityPlaceholder = String()
+        
+        self.offerData?.data.forEach({ index in
+            
+            if index.seniority.id == 1 {
+                seniorityPlaceholder = "Sin Experiencia"
+                
+            } else if index.seniority.id == 2 {
+                seniorityPlaceholder = "Junior"
+                
+            } else if index.seniority.id == 3 {
+                seniorityPlaceholder = "Semi Senior"
+                
+            } else if index.seniority.id == 4 {
+                seniorityPlaceholder = "Senior"
+                
+            } else if index.seniority.id == 5 {
+                seniorityPlaceholder = "Expert"
+                
+            } else {
+                seniorityPlaceholder = "not specified"
+            }
+        })
+        
+        // This line sets up the name of the company
+        configuration.secondaryText = "Seniority: \(seniorityPlaceholder) \n\(self.offerData?.data[indexPath.row].company.name ?? "null")"
+        
+        configuration.image = downloadImageFromInternet(urlFromInternet: self.offerData?.data[indexPath.row].company.logo ?? "null")
+        
+        cell.contentConfiguration = configuration
+        
+        return cell
+    }
+}

@@ -17,6 +17,9 @@ class TabBarController: UITabBarController {
         categoryController.title = "Categories"
         companyController.title = "Companies"
         
+        categoryController.navigationItem.title = "gola"
+        categoryController.navigationItem.largeTitleDisplayMode = .always
+        
         self.setViewControllers([categoryController, companyController], animated: false)
         
         guard let items = self.tabBar.items else { return }
@@ -28,6 +31,7 @@ class TabBarController: UITabBarController {
         
         self.tabBar.backgroundColor = .white
         self.tabBar.tintColor = .black
+        
         
     }
     

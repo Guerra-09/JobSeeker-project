@@ -7,8 +7,12 @@
 
 import Foundation
 
-protocol CategoryControllerProtocol {
-    func showList(list: [CategoryModel])
+
+protocol CategoryControllerProtocol: AnyObject {
+    func showList(list: CategoryHandler)
+    func showOfferList(model: [JobOfferModel])
+    func showCompanyList(model: [CompanyModel])
+    func errorList()
 }
 
 
