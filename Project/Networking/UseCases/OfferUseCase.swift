@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-class OfferPresenter {
+class OfferUseCase {
     
     private var offerDelegate: JobOfferService?
     

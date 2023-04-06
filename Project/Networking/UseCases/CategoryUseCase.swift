@@ -7,23 +7,22 @@
 
 import Foundation
 
-final class CategoryPresenter {
+final class CategoryUseCase {
     
-    private weak var view: CategoryControllerProtocol?
-    private var categoryUseCase: CategoryService?
+    private weak var view: ListControllerProtocol?
     private var categoryList: CategoryService?
     
-    init(categoryUseCase: CategoryService? = nil) {
-        self.categoryUseCase = categoryUseCase
+    init(categoryList: CategoryService) {
+        self.categoryList = categoryList
     }
     
-    func attach(view: CategoryControllerProtocol) {
+    func attach(view: ListControllerProtocol) {
         self.view = view
     }
     
     func requestCategories(completionHandler: @escaping (CategoryHandler?, Error?) -> Void) {
         
-        categoryUseCase?.fetchCategories { model, error in
+        categoryList?.fetchCategories { model, error in
             
             if let model = model {
                 completionHandler(model, nil)

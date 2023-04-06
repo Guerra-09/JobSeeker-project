@@ -11,8 +11,15 @@ class CompanyController: UIViewController {
     
     // MARK: - Variables
     
-    var companies: CompanyHandler?
+    private var presenter: ListPresenter?
+    private var model: [CompanyModel]?
     
+        
+    convenience init(presenter: ListPresenter? = nil) {
+        self.init()
+        self.presenter = presenter
+        self.presenter?.attach(view: self)
+    }
     
     
     // MARK: - Components
@@ -41,8 +48,12 @@ class CompanyController: UIViewController {
         self.tableView.delegate = self
         self.tableView.dataSource = self
         
+        
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        presenter?.showCompanyList()
+    }
     
     
 
@@ -52,15 +63,15 @@ class CompanyController: UIViewController {
     // MARK: - Setup UI
     
     private func loadApi() {
-        
-        let presenter = CompanyPresenter(companyApi: CompanyService())
-        
-        presenter.requestData { model, error in
+
+        let api = CompanyUseCase(companyApi: CompanyService())
+
+            api.requestData { model, error in
             if let error = error {
                 print(error)
             } else {
                 guard let modelData = model else { return }
-                self.companies = modelData
+                self.model = modelData.data
                 self.tableView.reloadData()
             }
         }
@@ -85,10 +96,45 @@ class CompanyController: UIViewController {
     
 }
 
-extension CompanyController: UITableViewDelegate, UITableViewDataSource {
+extension CompanyController: UITableViewDelegate {
+//    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+//
+//        return self.companies?.data.count ?? 0
+//    }
+    
+//    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+//
+//        guard let cell = tableView.dequeueReusableCell(withIdentifier: CompanyCell.identifier, for: indexPath) as? CompanyCell else {
+//            fatalError("ERROR: problema con el uitableviewcell")
+//        }
+//
+//
+//        cell.configure(with: "\(self.companies?.data[indexPath.row].logo ?? "bruh")", and: "\(self.companies?.data[indexPath.row].name ?? "null")")
+//
+//        return cell
+//    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let model = model else { return }
+        
+        let alert = UIAlertController(title: model[indexPath.row].id, message: "Empresa \(model[indexPath.row].name)", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+        }))
+        self.present(alert, animated: true, completion: nil)
+    
+    }
+}
+
+extension CompanyController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return self.companies?.data.count ?? 0
+        if model != nil {
+            return self.model?.count ?? 0
+            
+        } else {
+            return 0
+        }
+        
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -98,8 +144,31 @@ extension CompanyController: UITableViewDelegate, UITableViewDataSource {
         }
             
         
-        cell.configure(with: "\(self.companies?.data[indexPath.row].logo ?? "bruh")", and: "\(self.companies?.data[indexPath.row].name ?? "null")")
+        cell.configure(with: "\(self.model?[indexPath.row].logo ?? "aaa")", and: "\(self.model?[indexPath.row].name ?? "nombre = null")")
         
         return cell
+    }
+}
+
+extension CompanyController: ListControllerProtocol {
+    func categorySuccess(model: [CategoryModel]) {}
+    
+    func offerSuccess(model: [JobOfferModel]) {}
+    
+    
+    func listSuccess(model: [CompanyModel]) {
+        self.model = model
+        
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
+    
+    }
+    
+    func errorList() {
+        let alert = UIAlertController(title: "Error", message: "ups", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+        }))
+        self.present(alert, animated: true, completion: nil)
     }
 }

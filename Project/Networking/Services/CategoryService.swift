@@ -10,7 +10,7 @@ import Alamofire
 
 class CategoryService {
     
-    var categoryDelegate: CategoryControllerProtocol?
+    var categoryDelegate: ListPresenter?
     
     func fetchCategories(completionHandler: @escaping (CategoryHandler?, Error?) -> Void) {
         let url = "https://www.getonbrd.com/api/v0/categories?per_page=20&page=1"

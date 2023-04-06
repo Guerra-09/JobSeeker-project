@@ -12,9 +12,15 @@ class OfferViewController: UIViewController {
     
     
     // MARK: - Variables
+    private var presenter: ListPresenter?
+    private var model: [JobOfferModel]?
     
-    var offerTitle: CategoryModel?
-    private var offerData: JobOfferHandler?
+    convenience init(presenter: ListPresenter? = nil) {
+        self.init()
+        self.presenter = presenter
+        self.presenter?.attach(view: self)
+    }
+    
     
     
     
@@ -35,17 +41,17 @@ class OfferViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationItem.title = self.offerTitle?.name
-    
-        self.loadJobOffers()
+        navigationItem.title = "Titulo default"
         
         DispatchQueue.main.async { [weak self] in
             self?.offerTableView.delegate = self
             self?.offerTableView.dataSource = self
         }
         
-     
-        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        presenter?.showOffersCategory(type: <#T##String#>)
     }
     
     
@@ -71,25 +77,25 @@ class OfferViewController: UIViewController {
     
     
     // Esta funcion trae la info de la api y la setea como parte del self.offerData
-    func loadJobOffers() {
-        
-        let presenter = OfferPresenter(offerDelegate: JobOfferService())
-        presenter.requestData(jobId: self.offerTitle?.id ?? "programming") { model, error in
-
-            if let error = error {
-                print(error)
-            } else {
-                
-                guard let modelGet = model else { return }
-                
-                self.offerData = modelGet
-                
-                self.setUpView()
-                
-                    return
-            }
-        }
-    }
+//    func loadJobOffers() {
+//
+//        let presenter = OfferPresenter(offerDelegate: JobOfferService())
+//        presenter.requestData(jobId: self.offerTitle?.id ?? "programming") { model, error in
+//
+//            if let error = error {
+//                print(error)
+//            } else {
+//
+//                guard let modelGet = model else { return }
+//
+//                self.offerData = modelGet
+//
+//                self.setUpView()
+//
+//                    return
+//            }
+//        }
+//    }
     
     func downloadImageFromInternet(urlFromInternet: String) -> UIImage {
         let url = URL(string: urlFromInternet)!

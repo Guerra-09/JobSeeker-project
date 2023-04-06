@@ -10,10 +10,14 @@ import UIKit
 class CategoryController: UIViewController {
     
     // MARK: - Variables
+    private var presenter: ListPresenter?
+    private var model: [CategoryModel]?
     
-    private var model: CategoryHandler?
-    private var presenter: CategoryPresenter?
-    
+    convenience init(presenter: ListPresenter? = nil) {
+        self.init()
+        self.presenter = presenter
+        self.presenter?.attach(view: self)
+    }
     
     
     // MARK: - Components
@@ -31,12 +35,7 @@ class CategoryController: UIViewController {
     
     
     // MARK: - LifeCycle
-    
-    convenience init(presenter: CategoryPresenter? = nil) {
-        self.init()
-        self.presenter = presenter
-        self.presenter?.attach(view: self)
-    }
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -48,11 +47,7 @@ class CategoryController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        
-        /// Remember: Esta linea de codigo deseleciona las celdas al carga la view
-        if let indexPath = self.tableView.indexPathForSelectedRow {
-                 tableView.deselectRow(at: indexPath, animated: true)
-            }
+        presenter?.showCategoryList()
         
     }
     
@@ -60,23 +55,18 @@ class CategoryController: UIViewController {
     
     private func loadApi() {
     
-        let presenter = CategoryPresenter(categoryUseCase: CategoryService())
-        presenter.requestCategories { model, error in
+        let categoryApi = CategoryUseCase(categoryList: CategoryService())
+        
+        categoryApi.requestCategories { model, error in
 
             if let error = error {
                 print(error)
             } else {
-                // Running perfectly
+                guard let modelData = model else { return }
+                self.model = modelData.data
+                self.tableView.reloadData()
             }
     
-            
-            guard model == nil else {
-                
-                self.model = model
-                self.tableView.reloadData()
-                
-                return
-            }
         }
     }
     
@@ -103,12 +93,22 @@ class CategoryController: UIViewController {
 
 
 
-extension CategoryController: UITableViewDelegate, UITableViewDataSource {
+extension CategoryController: UITableViewDelegate {
+        
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        let vc = OfferViewController()
+        vc.offerTitle = self.model?[indexPath.row]
+        navigationController?.pushViewController(vc, animated: true)
+    }
+
+}
+
+extension CategoryController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.model?.data.count ?? 1
         
-        
+        return self.model?.count ?? 1
     }
     
     
@@ -118,43 +118,30 @@ extension CategoryController: UITableViewDelegate, UITableViewDataSource {
             fatalError("ERROR: problema con el uitableviewcell")
         }
         
-        let categoryModel = self.model?.data
+        let categoryModel = self.model
         cell.textLabel?.text = "\(categoryModel?[indexPath.row].name ?? "null")"
         return cell
     }
 
-    
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let vc = OfferViewController()
-        vc.offerTitle = self.model?.data[indexPath.row]
-        navigationController?.pushViewController(vc, animated: true)
-    }
-    
-
-    
-    
-
 }
 
 
-extension CategoryController: CategoryControllerProtocol {
-    func showList(list: CategoryHandler) {
-        self.model = list
+extension CategoryController: ListControllerProtocol {
+    
+    func listSuccess(model: [CompanyModel]) { }
+    func offerSuccess(model: [JobOfferModel]) { }
+    
+    func categorySuccess(model: [CategoryModel]) {
+        self.model = model
         
         DispatchQueue.main.async {
             self.tableView.reloadData()
         }
-        
     }
     
+    
 
-    
-    
-    
-    func showOfferList(model: [JobOfferModel]) {}
-    
-    func showCompanyList(model: [CompanyModel]) {}
+
     
     func errorList() {
         let alert = UIAlertController(title: "Error", message: "Something went wrong", preferredStyle: .alert)

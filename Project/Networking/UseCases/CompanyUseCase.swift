@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-class CompanyPresenter {
+class CompanyUseCase {
     
     private var companyApi: CompanyService?
     

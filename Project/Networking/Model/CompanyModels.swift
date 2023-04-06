@@ -9,8 +9,6 @@ import Foundation
 
 struct CompanyHandler: Codable {
     let data: [CompanyModel]
-    
-    
 }
 
 struct CompanyModel: Codable {
