@@ -44,7 +44,8 @@ class OfferDetailsViewController: UIViewController {
     private var descriptionLabel: UILabel = {
        let descriptionLabel = UILabel()
         descriptionLabel.text = "description placeholder"
-        descriptionLabel.numberOfLines = 15
+        descriptionLabel.numberOfLines = 0
+        
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
         return descriptionLabel
     }()
@@ -73,8 +74,20 @@ class OfferDetailsViewController: UIViewController {
         return button
     }()
     
-    private let scrollView = UIScrollView()
+    private let stackView: UIStackView = {
+       let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 10
+        stackView.alignment = .center
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
     
+    private let scrollView: UIScrollView = {
+        let scroll = UIScrollView()
+        scroll.translatesAutoresizingMaskIntoConstraints = false
+        return scroll
+    }()
     
     
     
@@ -83,34 +96,56 @@ class OfferDetailsViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
         
-        self.setupUI()
-        
+        self.setupTexts()
+        self.setUpView()
    
     }
     
     
     // MARK: -> Setting Up View
+    
+    private func setUpView() {
+        
+        let margins = view.layoutMarginsGuide
+        
+        view.addSubview(scrollView)
+        scrollView.addSubview(stackView)
+        NSLayoutConstraint.activate([
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.topAnchor.constraint(equalTo: margins.topAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: margins.bottomAnchor),
+            
+            stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            stackView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+        ])
+
+        addingSubViews()
+    }
+    
 
     
-    private func setupUI() {
-        
-  
-        self.view.addSubview(titleLabel)
-        self.view.addSubview(seniorityLabel)
-        self.view.addSubview(modalityLabel)
-        self.view.addSubview(remoteModality)
-        self.view.addSubview(companyLogo)
-        self.view.addSubview(companyName)
-        self.view.addSubview(descriptionLabel)
-        self.view.addSubview(buttonLink)
+    private func addingSubViews() {
+        stackView.addArrangedSubview(titleLabel)
+        stackView.addArrangedSubview(seniorityLabel)
+        stackView.addArrangedSubview(modalityLabel)
+        stackView.addArrangedSubview(remoteModality)
+        stackView.addArrangedSubview(companyLogo)
+        stackView.addArrangedSubview(companyName)
+        stackView.addArrangedSubview(descriptionLabel)
+        stackView.addArrangedSubview(buttonLink)
+    }
     
+    private func setupTexts() {
         
         // Setting up Title label
         titleLabel.text = self.jobInfo?.title
         if let titleLenght = self.jobInfo?.title.count {
             titleLabel.font = titleLenght < 22 ? UIFont(name: "HelveticaNeue-Bold", size: 30.0) : UIFont(name: "HelveticaNeue-Bold", size: 20.0)
         }
-
         
         
         // Settingup seniority Label
@@ -163,7 +198,6 @@ class OfferDetailsViewController: UIViewController {
         modalityLabel.text = "Tipo: \(modalityPlaceholder)"
         
         
-        
         // Setting up modality remote
         if self.jobInfo?.remoteModality == "no_remote" {
             remoteModality.text = "Modalidad: No remoto"
@@ -184,57 +218,11 @@ class OfferDetailsViewController: UIViewController {
             remoteModality.text = "Modalidad: Caso extranio"
             print(self.jobInfo?.remoteModality ?? "Error")
             
-            
         }
     
-        
         // Setting up requirements of the job
         descriptionLabel.text = "Requerimientos del cargo:\n\(self.jobInfo?.description.htmlToString ?? "null")"
-        
-        NSLayoutConstraint.activate([
-    
-            //Setting up Offer Name constraints
-            titleLabel.topAnchor.constraint(equalTo: self.view.layoutMarginsGuide.topAnchor),
-            titleLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
-            titleLabel.bottomAnchor.constraint(equalTo: seniorityLabel.topAnchor),
-            
-            // Setting up seniority constraints
-            seniorityLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor),
-            seniorityLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
-            seniorityLabel.bottomAnchor.constraint(equalTo: modalityLabel.topAnchor),
-            
-            
-            modalityLabel.topAnchor.constraint(equalTo: seniorityLabel.bottomAnchor),
-            modalityLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
-            modalityLabel.bottomAnchor.constraint(equalTo: remoteModality.topAnchor),
-            
-            remoteModality.topAnchor.constraint(equalTo: modalityLabel.bottomAnchor),
-            remoteModality.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
-            remoteModality.bottomAnchor.constraint(equalTo: companyLogo.topAnchor),
-            
-            // Setting up company logo
-            companyLogo.topAnchor.constraint(equalTo: remoteModality.bottomAnchor),
-            companyLogo.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
-            companyLogo.bottomAnchor.constraint(equalTo: companyName.topAnchor),
-            
-            
-            // Setting up company name
-            companyName.topAnchor.constraint(equalTo: companyLogo.bottomAnchor),
-            companyName.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
-            companyName.bottomAnchor.constraint(equalTo: descriptionLabel.topAnchor),
-            
-            
-            descriptionLabel.topAnchor.constraint(equalTo: companyName.bottomAnchor),
-            descriptionLabel.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
-            descriptionLabel.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
-            descriptionLabel.bottomAnchor.constraint(equalTo: buttonLink.topAnchor),
-            
-            buttonLink.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor),
-            buttonLink.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
-            buttonLink.bottomAnchor.constraint(equalTo: self.view.layoutMarginsGuide.bottomAnchor, constant: -50)
-        
-            
-        ])
+              
     }
     
     
@@ -245,11 +233,14 @@ class OfferDetailsViewController: UIViewController {
         }
         
         let vc = WebViewViewController(url: url, title: "\(String(describing: self.jobInfo?.publicUrl ?? "https://google.com"))")
+        
+        
+        // These lines below throw a Security Error, It's supposed to be an Apple Bug
         let navVC = UINavigationController(rootViewController: vc)
-        present(navVC, animated: true)
-        
-
-        
+        DispatchQueue.main.async {
+            self.present(navVC, animated: true)
+        }
+ 
     }
     
 }
