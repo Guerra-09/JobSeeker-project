@@ -34,11 +34,8 @@ class CompanyService {
                 print(error.localizedDescription)
                 print(String(describing: error))
                 completionHandler(nil, error)
-                
             }
         }
     }
-    
-    
 }
 

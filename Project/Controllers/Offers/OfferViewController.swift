@@ -15,6 +15,9 @@ class OfferViewController: UIViewController {
     private var presenter: ListPresenter?
     private var model: [JobOfferModel]?
     
+    var jobTitle: String?
+    var jobSelected: String?
+    
     convenience init(presenter: ListPresenter? = nil) {
         self.init()
         self.presenter = presenter
@@ -36,26 +39,51 @@ class OfferViewController: UIViewController {
     
     
     
+    
     // MARK: - LifeCycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationItem.title = "Titulo default"
+        navigationItem.title = self.jobTitle
         
         DispatchQueue.main.async { [weak self] in
             self?.offerTableView.delegate = self
             self?.offerTableView.dataSource = self
         }
         
+        self.setUpView()
+        self.loadApi()
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        presenter?.showOffersCategory(type: <#T##String#>)
+        presenter?.showOffersCategory(type: "\(self.jobSelected!)")
     }
     
     
     // MARK: - Setting UP View
+    
+    private func loadApi() {
+        
+        let categoryApi = OfferUseCase(offersList: JobOffersService())
+        
+        categoryApi.requestData(jobId: self.jobSelected ?? "nil", completionHandler: { model, error in
+            
+            if let error = error {
+                print(error)
+                
+            } else {
+                guard let modelData = model else { return }
+                self.model = modelData.data
+                self.offerTableView.reloadData()
+                
+            }
+            
+        })
+        
+        
+    }
     
     func setUpView() {
         
@@ -75,28 +103,6 @@ class OfferViewController: UIViewController {
     
     // MARK: - Methods
     
-    
-    // Esta funcion trae la info de la api y la setea como parte del self.offerData
-//    func loadJobOffers() {
-//
-//        let presenter = OfferPresenter(offerDelegate: JobOfferService())
-//        presenter.requestData(jobId: self.offerTitle?.id ?? "programming") { model, error in
-//
-//            if let error = error {
-//                print(error)
-//            } else {
-//
-//                guard let modelGet = model else { return }
-//
-//                self.offerData = modelGet
-//
-//                self.setUpView()
-//
-//                    return
-//            }
-//        }
-//    }
-    
     func downloadImageFromInternet(urlFromInternet: String) -> UIImage {
         let url = URL(string: urlFromInternet)!
         let session = URLSession(configuration: .default)
@@ -107,8 +113,8 @@ class OfferViewController: UIViewController {
             if let e = error {
                 print("Error downloading picture: \(e)")
             } else {
-                if let res = response as? HTTPURLResponse {
-                    //print("Downloaded \(urlFromInternet) picture with response code \(res.statusCode)")
+                if response is HTTPURLResponse {
+
                     if let imageData = data {
                         imageFinal = UIImage(data: imageData) ?? UIImage()
                     } else {
@@ -133,12 +139,12 @@ class OfferViewController: UIViewController {
 
 extension OfferViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.offerData?.data.count ?? 0
+        return self.model?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let offerDetailVC = OfferDetailsViewController()
-        offerDetailVC.jobInfo = self.offerData?.data[indexPath.row]
+        offerDetailVC.jobInfo = self.model?[indexPath.row]
         navigationController?.pushViewController(offerDetailVC, animated: true)
         
     }
@@ -152,7 +158,7 @@ extension OfferViewController: UITableViewDataSource {
             fatalError("ERROR: problema con el uitableviewcell")
         }
         
-        let offerModel = self.offerData?.data
+        let offerModel = self.model
         var configuration = UIListContentConfiguration.cell()
         configuration.text = "\(offerModel?[indexPath.row].title ?? "null")"
         
@@ -160,7 +166,7 @@ extension OfferViewController: UITableViewDataSource {
         // This line sets up the seniority level of the offer
         var seniorityPlaceholder = String()
         
-        self.offerData?.data.forEach({ index in
+        self.model?.forEach({ index in
             
             if index.seniority.id == 1 {
                 seniorityPlaceholder = "Sin Experiencia"
@@ -183,12 +189,38 @@ extension OfferViewController: UITableViewDataSource {
         })
         
         // This line sets up the name of the company
-        configuration.secondaryText = "Seniority: \(seniorityPlaceholder) \n\(self.offerData?.data[indexPath.row].company.name ?? "null")"
+        configuration.secondaryText = "Seniority: \(seniorityPlaceholder) \n\(self.model?[indexPath.row].company.name ?? "null")"
         
-        configuration.image = downloadImageFromInternet(urlFromInternet: self.offerData?.data[indexPath.row].company.logo ?? "null")
+        configuration.image = downloadImageFromInternet(urlFromInternet: self.model?[indexPath.row].company.logo ?? "null")
         
         cell.contentConfiguration = configuration
         
         return cell
     }
+}
+
+
+extension OfferViewController: ListControllerProtocol {
+    func listSuccess(model: [CompanyModel]) {}
+    
+    func categorySuccess(model: [CategoryModel]) {}
+    
+    func offerSuccess(model: [JobOfferModel]) {
+        
+        self.model = model
+        
+        DispatchQueue.main.async {
+            //self.tab
+        }
+    }
+    
+    func errorList() {
+        let alert = UIAlertController(title: "Error", message: "Something went wrong", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: { _ in
+            
+        }))
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    
 }

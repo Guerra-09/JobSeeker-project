@@ -97,22 +97,6 @@ class CompanyController: UIViewController {
 }
 
 extension CompanyController: UITableViewDelegate {
-//    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-//
-//        return self.companies?.data.count ?? 0
-//    }
-    
-//    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//
-//        guard let cell = tableView.dequeueReusableCell(withIdentifier: CompanyCell.identifier, for: indexPath) as? CompanyCell else {
-//            fatalError("ERROR: problema con el uitableviewcell")
-//        }
-//
-//
-//        cell.configure(with: "\(self.companies?.data[indexPath.row].logo ?? "bruh")", and: "\(self.companies?.data[indexPath.row].name ?? "null")")
-//
-//        return cell
-//    }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let model = model else { return }
@@ -130,6 +114,7 @@ extension CompanyController: UITableViewDataSource {
         
         if model != nil {
             return self.model?.count ?? 0
+            //return 1
             
         } else {
             return 0

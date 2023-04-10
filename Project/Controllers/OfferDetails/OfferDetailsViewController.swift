@@ -12,7 +12,6 @@ import WebKit
 class OfferDetailsViewController: UIViewController {
     
     var jobInfo: JobOfferModel?
-
     
     // MARK: -> Components
     
@@ -70,9 +69,13 @@ class OfferDetailsViewController: UIViewController {
         let button = UIButton(type: .system)
         button.configuration = btn
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(didTapButton), for: .touchUpInside)
+        button.addTarget(OfferDetailsViewController.self, action: #selector(didTapButton), for: .touchUpInside)
         return button
     }()
+    
+    private let scrollView = UIScrollView()
+    
+    
     
     
     // MARK: -> Life Cycle
@@ -81,11 +84,22 @@ class OfferDetailsViewController: UIViewController {
         view.backgroundColor = .white
         
         self.setupUI()
-    
+        //view.addSubview(scrollView)
+
+//        scrollView.translatesAutoresizingMaskIntoConstraints = false
+//        NSLayoutConstraint.activate([
+//            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
+//            scrollView.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+//            scrollView.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+//            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+//
+//        ])
+   
     }
     
     
     // MARK: -> Setting Up View
+
     
     private func setupUI() {
         
@@ -177,13 +191,14 @@ class OfferDetailsViewController: UIViewController {
             
         }else {
             remoteModality.text = "Modalidad: Caso extranio"
-            print(self.jobInfo?.remoteModality)
+            print(self.jobInfo?.remoteModality ?? "Error")
+            
+            
         }
     
         
         // Setting up requirements of the job
         descriptionLabel.text = "Requerimientos del cargo:\n\(self.jobInfo?.description.htmlToString ?? "null")"
-    
         
         NSLayoutConstraint.activate([
     
@@ -219,14 +234,14 @@ class OfferDetailsViewController: UIViewController {
             
             
             descriptionLabel.topAnchor.constraint(equalTo: companyName.bottomAnchor),
-            descriptionLabel.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 10),
-            descriptionLabel.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -10),
+            descriptionLabel.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+            descriptionLabel.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
             descriptionLabel.bottomAnchor.constraint(equalTo: buttonLink.topAnchor),
             
-            buttonLink.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: -30),
+            buttonLink.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor),
             buttonLink.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
             buttonLink.bottomAnchor.constraint(equalTo: self.view.layoutMarginsGuide.bottomAnchor, constant: -50),
-            buttonLink.heightAnchor.constraint(equalToConstant: 35),
+
             
             
             
@@ -243,6 +258,9 @@ class OfferDetailsViewController: UIViewController {
         let vc = WebViewViewController(url: url, title: "\(String(describing: self.jobInfo?.publicUrl ?? "https://google.com"))")
         let navVC = UINavigationController(rootViewController: vc)
         present(navVC, animated: true)
+        
+
+        
     }
     
 }
@@ -273,3 +291,21 @@ extension UIImageView {
 
 
 
+extension String {
+    func paragraphs(withLineLength lineLength: Int) -> String {
+        var result = ""
+        var currentLine = ""
+        let words = self.split(separator: " ", omittingEmptySubsequences: false)
+        for word in words {
+            let wordWithSpace = word + " "
+            if currentLine.count + wordWithSpace.count <= lineLength {
+                currentLine += wordWithSpace
+            } else {
+                result += currentLine + "\n"
+                currentLine = String(wordWithSpace)
+            }
+        }
+        result += currentLine
+        return result
+    }
+}

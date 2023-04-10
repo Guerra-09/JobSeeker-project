@@ -5,9 +5,9 @@ final class ListPresenter {
     private weak var view: ListControllerProtocol?
     private var listCompany: CompanyService?
     private var listCategory: CategoryService?
-    private var listOffers: JobOfferService?
+    private var listOffers: JobOffersService?
     
-    init(listCompany: CompanyService? = nil, listCategory: CategoryService? = nil, listOffers: JobOfferService? = nil) {
+    init(listCompany: CompanyService? = nil, listCategory: CategoryService? = nil, listOffers: JobOffersService? = nil) {
         self.listCompany = listCompany
         self.listCategory = listCategory
         self.listOffers = listOffers

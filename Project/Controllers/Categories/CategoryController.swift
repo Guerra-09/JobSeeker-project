@@ -30,7 +30,13 @@ class CategoryController: UIViewController {
         tableView.register(CategoryCell.self, forCellReuseIdentifier: CategoryCell.identifier)
         return tableView
     }()
-
+    
+    
+    private let spinnerView: UIActivityIndicatorView = {
+        let spinner = UIActivityIndicatorView(style: .large)
+        spinner.translatesAutoresizingMaskIntoConstraints = false
+        return spinner
+    }()
     
     
     
@@ -75,7 +81,10 @@ class CategoryController: UIViewController {
     private func setupUI() {
         self.view.backgroundColor = .systemBlue
         self.navigationItem.title = "Categories"
+        
         self.view.addSubview(tableView)
+        self.view.addSubview(spinnerView)
+        
         tableView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
@@ -83,6 +92,9 @@ class CategoryController: UIViewController {
             tableView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
             tableView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
+            
+            spinnerView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
+            spinnerView.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
         ])
     }
     
@@ -99,7 +111,8 @@ extension CategoryController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         let vc = OfferViewController()
-        vc.offerTitle = self.model?[indexPath.row]
+        vc.jobSelected = self.model?[indexPath.row].id
+        vc.jobTitle = self.model?[indexPath.row].name
         navigationController?.pushViewController(vc, animated: true)
     }
 
@@ -119,8 +132,17 @@ extension CategoryController: UITableViewDataSource {
         }
         
         let categoryModel = self.model
-        cell.textLabel?.text = "\(categoryModel?[indexPath.row].name ?? "null")"
-        return cell
+        
+        if let categoryModel = categoryModel {
+            cell.textLabel?.text = "\(categoryModel[indexPath.row].name)"
+            spinnerView.stopAnimating()
+
+        } else {
+            spinnerView.startAnimating()
+        }
+        
+//        cell.textLabel?.text = "\(categoryModel?[indexPath.row].name ?? "loading...")"
+            return cell
     }
 
 }

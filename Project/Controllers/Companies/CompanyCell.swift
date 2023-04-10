@@ -25,6 +25,7 @@ class CompanyCell: UITableViewCell {
         let imageView = UIImageView()
         imageView.image = UIImage(systemName: "photo")
         imageView.contentMode = .scaleAspectFit
+        //imageView.bounds.size = CGSize(width: 45, height: 45)
         return imageView
         
     }()
@@ -51,6 +52,7 @@ class CompanyCell: UITableViewCell {
         companyCellLabel.translatesAutoresizingMaskIntoConstraints = false
         companyCellLogo.translatesAutoresizingMaskIntoConstraints = false
         
+        
         NSLayoutConstraint.activate([
         
             companyCellLogo.topAnchor.constraint(equalTo: self.contentView.layoutMarginsGuide.topAnchor),
@@ -59,8 +61,8 @@ class CompanyCell: UITableViewCell {
             companyCellLogo.heightAnchor.constraint(equalToConstant: 90),
             companyCellLogo.widthAnchor.constraint(equalToConstant: 90),
             
-            companyCellLabel.leadingAnchor.constraint(equalTo: self.companyCellLogo.trailingAnchor, constant: 16),
-            companyCellLabel.trailingAnchor.constraint(equalTo: self.contentView.layoutMarginsGuide.trailingAnchor, constant: -12),
+            companyCellLabel.leadingAnchor.constraint(equalTo: self.companyCellLogo.trailingAnchor),
+            companyCellLabel.trailingAnchor.constraint(equalTo: self.contentView.layoutMarginsGuide.trailingAnchor),
             companyCellLabel.bottomAnchor.constraint(equalTo: self.contentView.layoutMarginsGuide.bottomAnchor),
             companyCellLabel.topAnchor.constraint(equalTo: self.contentView.layoutMarginsGuide.topAnchor),
             

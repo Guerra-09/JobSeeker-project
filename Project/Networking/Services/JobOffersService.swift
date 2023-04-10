@@ -8,11 +8,11 @@
 import Foundation
 import Alamofire
 
-class JobOfferService {
+class JobOffersService {
     
-    //private var jobOfferDelegate: CompanyControllerProtocol?
+    var offerDelegate: ListPresenter?
     
-    func fetchingOffersData(jobId: String ,completionHandler: @escaping (JobOfferHandler?, Error?) -> Void) {
+    func fetchingOffersData(jobId: String = "" ,completionHandler: @escaping (JobOfferHandler?, Error?) -> Void) {
         
         let url = "https://www.getonbrd.com/api/v0/categories/\(jobId)/jobs?per_page=25&page=1&expand=[%22company%22]"
         

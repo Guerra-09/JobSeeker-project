@@ -29,7 +29,6 @@ class CategoryService {
                 }
             
             case .failure(let error):
-                //print(error.localizedDescription)
                 print(String(describing: error))
                 completionHandler(nil, error)
                 
