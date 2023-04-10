@@ -69,7 +69,7 @@ class OfferDetailsViewController: UIViewController {
         let button = UIButton(type: .system)
         button.configuration = btn
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(OfferDetailsViewController.self, action: #selector(didTapButton), for: .touchUpInside)
+        button.addTarget(self, action: #selector(didTapButton), for: .touchUpInside)
         return button
     }()
     
@@ -84,16 +84,7 @@ class OfferDetailsViewController: UIViewController {
         view.backgroundColor = .white
         
         self.setupUI()
-        //view.addSubview(scrollView)
-
-//        scrollView.translatesAutoresizingMaskIntoConstraints = false
-//        NSLayoutConstraint.activate([
-//            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
-//            scrollView.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-//            scrollView.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-//            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-//
-//        ])
+        
    
     }
     
@@ -240,10 +231,8 @@ class OfferDetailsViewController: UIViewController {
             
             buttonLink.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor),
             buttonLink.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
-            buttonLink.bottomAnchor.constraint(equalTo: self.view.layoutMarginsGuide.bottomAnchor, constant: -50),
-
-            
-            
+            buttonLink.bottomAnchor.constraint(equalTo: self.view.layoutMarginsGuide.bottomAnchor, constant: -50)
+        
             
         ])
     }
