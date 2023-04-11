@@ -14,8 +14,6 @@ class OfferDetailsViewController: UIViewController {
     var jobInfo: JobOfferModel?
     
     // MARK: -> Components
-    
-    
     private var titleLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -45,7 +43,7 @@ class OfferDetailsViewController: UIViewController {
        let descriptionLabel = UILabel()
         descriptionLabel.text = "description placeholder"
         descriptionLabel.numberOfLines = 0
-        
+        descriptionLabel.frame = CGRect(x: 0, y: 0, width: 200, height: 1000)
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
         return descriptionLabel
     }()
@@ -60,6 +58,7 @@ class OfferDetailsViewController: UIViewController {
     
     private var companyName: UILabel = {
         let label = UILabel()
+        label.font = UIFont(name: "HelveticaNeue-Bold", size: 13.5)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -85,18 +84,19 @@ class OfferDetailsViewController: UIViewController {
     
     private let scrollView: UIScrollView = {
         let scroll = UIScrollView()
+        scroll.showsVerticalScrollIndicator = false
         scroll.translatesAutoresizingMaskIntoConstraints = false
         return scroll
     }()
+
     
     
     
     // MARK: -> Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
-        
-        self.setupTexts()
+        view.backgroundColor = UIColor(named: "backgroundColor")
+
         self.setUpView()
    
     }
@@ -111,8 +111,8 @@ class OfferDetailsViewController: UIViewController {
         view.addSubview(scrollView)
         scrollView.addSubview(stackView)
         NSLayoutConstraint.activate([
-            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12),
             scrollView.topAnchor.constraint(equalTo: margins.topAnchor),
             scrollView.bottomAnchor.constraint(equalTo: margins.bottomAnchor),
             
@@ -137,18 +137,31 @@ class OfferDetailsViewController: UIViewController {
         stackView.addArrangedSubview(companyName)
         stackView.addArrangedSubview(descriptionLabel)
         stackView.addArrangedSubview(buttonLink)
+        
+        self.setUpLabelTitle()
+        self.setUpCompanyName()
+        self.setUpSeniorityLevel()
+        self.setUpCompanyLogo()
+        self.setUpJobType(modalityId: self.jobInfo?.modality.id ?? 0)
+        self.setUpRemoteModality(modalidad: "\(self.jobInfo?.remoteModality)")
+        self.setUpDescription()
     }
     
-    private func setupTexts() {
-        
+    func setUpCompanyName() {
+        companyName.text = self.jobInfo?.company.name
+              
+    }
+    
+    func setUpLabelTitle() {
         // Setting up Title label
         titleLabel.text = self.jobInfo?.title
         if let titleLenght = self.jobInfo?.title.count {
             titleLabel.font = titleLenght < 22 ? UIFont(name: "HelveticaNeue-Bold", size: 30.0) : UIFont(name: "HelveticaNeue-Bold", size: 20.0)
         }
-        
-        
-        // Settingup seniority Label
+    }
+    
+    func setUpSeniorityLevel() {
+
         if self.jobInfo?.seniority.id == 1 {
             seniorityLabel.text = "Seniority: Sin Experiencia"
             
@@ -167,29 +180,23 @@ class OfferDetailsViewController: UIViewController {
         } else {
             seniorityLabel.text = "Seniority: not specified"
         }
-        
-        
-        // Setting up company logo and name
-        companyName.text = self.jobInfo?.company.name
-        if let logoUrl = self.jobInfo?.company.logo  {
-            companyLogo.load(urlRequest: logoUrl)
-        } else {
-            companyLogo.image = UIImage(systemName: "photo")
-        }
-        
-        
+    }
+    
+    
+    func setUpJobType(modalityId: Int) -> String {
         // Setting up type of job
         var modalityPlaceholder = ""
-        if self.jobInfo?.modality.id == 1 {
+        
+        if modalityId == 1 {
             modalityPlaceholder = "Full Time"
             
-        } else if self.jobInfo?.modality.id == 2 {
+        } else if modalityId == 2 {
             modalityPlaceholder = "Part Time"
             
-        } else if self.jobInfo?.modality.id == 3 {
+        } else if modalityId == 3 {
             modalityPlaceholder = "Freelance"
             
-        }else if self.jobInfo?.modality.id == 4 {
+        }else if modalityId == 4 {
             modalityPlaceholder = "Práctica/Internship"
             
         } else {
@@ -197,32 +204,54 @@ class OfferDetailsViewController: UIViewController {
         }
         modalityLabel.text = "Tipo: \(modalityPlaceholder)"
         
-        
+        return modalityPlaceholder
+    }
+    
+    
+    
+    func setUpRemoteModality(modalidad: String) -> String {
         // Setting up modality remote
-        if self.jobInfo?.remoteModality == "no_remote" {
+        if modalidad == "no_remote" {
             remoteModality.text = "Modalidad: No remoto"
+            return "Modalidad: No remoto"
             
-        } else if self.jobInfo?.remoteModality == "temporarily_remote" {
+        } else if modalidad == "temporarily_remote" {
             remoteModality.text = "Modalidad: Temporalmente remoto"
+            return "Modalidad: Temporalmente remoto"
             
-        } else if self.jobInfo?.remoteModality == "remote_local" {
+        } else if modalidad == "remote_local" {
             remoteModality.text = "Modalidad: Temporalmente remoto"
+            return "Modalidad: Temporalmente remoto"
             
-        } else if self.jobInfo?.remoteModality == "fully_remote" {
+        } else if modalidad == "fully_remote" {
             remoteModality.text = "Modalidad: Remoto"
+            return "Modalidad: Remoto"
             
-        } else if self.jobInfo?.remoteModality == "hybrid" {
+        } else if modalidad == "hybrid" {
             remoteModality.text = "Modalidad: Hibrido"
+            return "Modalidad: Hibrido"
             
         }else {
             remoteModality.text = "Modalidad: Caso extranio"
             print(self.jobInfo?.remoteModality ?? "Error")
-            
+            return modalidad
         }
+        
+    }
     
+    func setUpCompanyLogo() {
+        
+        
+        if let logoUrl = self.jobInfo?.company.logo  {
+            companyLogo.load(urlRequest: logoUrl)
+        } else {
+            companyLogo.image = UIImage(systemName: "photo")
+        }
+    }
+    
+    func setUpDescription() {
         // Setting up requirements of the job
-        descriptionLabel.text = "Requerimientos del cargo:\n\(self.jobInfo?.description.htmlToString ?? "null")"
-              
+        descriptionLabel.text = "Requerimientos del cargo:\n\n\(self.jobInfo?.description.htmlToString ?? "null")"
     }
     
     
@@ -244,7 +273,6 @@ class OfferDetailsViewController: UIViewController {
     }
     
 }
-
 
 extension UIImageView {
     
@@ -269,23 +297,3 @@ extension UIImageView {
     }
 }
 
-
-
-extension String {
-    func paragraphs(withLineLength lineLength: Int) -> String {
-        var result = ""
-        var currentLine = ""
-        let words = self.split(separator: " ", omittingEmptySubsequences: false)
-        for word in words {
-            let wordWithSpace = word + " "
-            if currentLine.count + wordWithSpace.count <= lineLength {
-                currentLine += wordWithSpace
-            } else {
-                result += currentLine + "\n"
-                currentLine = String(wordWithSpace)
-            }
-        }
-        result += currentLine
-        return result
-    }
-}

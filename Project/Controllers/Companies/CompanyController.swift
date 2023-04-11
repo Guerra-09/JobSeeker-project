@@ -10,7 +10,6 @@ import UIKit
 class CompanyController: UIViewController {
     
     // MARK: - Variables
-    
     private var presenter: ListPresenter?
     private var model: [CompanyModel]?
     
@@ -105,7 +104,8 @@ extension CompanyController: UITableViewDelegate {
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
         }))
         self.present(alert, animated: true, completion: nil)
-    
+
+        
     }
 }
 

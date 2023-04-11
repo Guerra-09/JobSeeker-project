@@ -37,7 +37,7 @@ class OfferViewController: UIViewController {
         return tableView
     }()
     
-    
+
     
     
     // MARK: - LifeCycle
@@ -53,7 +53,6 @@ class OfferViewController: UIViewController {
         }
         
         self.setUpView()
-        self.loadApi()
         
     }
     
@@ -63,28 +62,6 @@ class OfferViewController: UIViewController {
     
     
     // MARK: - Setting UP View
-    
-    private func loadApi() {
-        
-        let categoryApi = OfferUseCase(offersList: JobOffersService())
-        
-        categoryApi.requestData(jobId: self.jobSelected ?? "nil", completionHandler: { model, error in
-            
-            if let error = error {
-                print(error)
-                
-            } else {
-                guard let modelData = model else { return }
-                self.model = modelData.data
-                self.offerTableView.reloadData()
-                
-            }
-            
-        })
-        
-        
-    }
-    
     func setUpView() {
         
         view.addSubview(offerTableView)
@@ -93,16 +70,15 @@ class OfferViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             offerTableView.topAnchor.constraint(equalTo: self.view.topAnchor),
-            offerTableView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
             offerTableView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
             offerTableView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
+            offerTableView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
         ])
         
     }
     
     
     // MARK: - Methods
-    
     func downloadImageFromInternet(urlFromInternet: String) -> UIImage {
         let url = URL(string: urlFromInternet)!
         let session = URLSession(configuration: .default)
@@ -210,7 +186,7 @@ extension OfferViewController: ListControllerProtocol {
         self.model = model
         
         DispatchQueue.main.async {
-            //self.tab
+            self.offerTableView.reloadData()
         }
     }
     
