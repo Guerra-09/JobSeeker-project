@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 class CompanyCell: UITableViewCell {
 
@@ -16,14 +17,14 @@ class CompanyCell: UITableViewCell {
         name.text = " "
         name.textColor = .label
         name.textAlignment = .left
-        name.font = .systemFont(ofSize: 24, weight: .medium)
+        name.font = .systemFont(ofSize: 18, weight: .medium)
         return name
     }()
     
     private var companyCellLogo: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(systemName: "photo")
-        //imageView.contentMode = .scaleAspectFit
+        imageView.contentMode = .scaleAspectFit
         return imageView
         
     }()
@@ -37,9 +38,15 @@ class CompanyCell: UITableViewCell {
         fatalError("init(coder:) no implementado")
     }
     
-    public func configure(with image: String, and label: String) {
+    
+    public func configure(url image: String, and label: String) {
         
-        self.companyCellLogo.load(urlRequest: image)
+        if image == "" {
+            self.companyCellLogo.image = UIImage(systemName: "photo")
+        } else {
+            self.companyCellLogo.kf.setImage(with: URL(string: image))
+        }
+        
         self.companyCellLabel.text = label
     }
     
@@ -50,22 +57,36 @@ class CompanyCell: UITableViewCell {
         companyCellLabel.translatesAutoresizingMaskIntoConstraints = false
         companyCellLogo.translatesAutoresizingMaskIntoConstraints = false
         
+        
         NSLayoutConstraint.activate([
         
-            companyCellLogo.topAnchor.constraint(equalTo: self.contentView.layoutMarginsGuide.topAnchor),
-            companyCellLogo.leadingAnchor.constraint(equalTo: self.contentView.layoutMarginsGuide.leadingAnchor),
-            companyCellLogo.trailingAnchor.constraint(equalTo: companyCellLabel.leadingAnchor, constant: -15),
-            companyCellLogo.bottomAnchor.constraint(equalTo: self.contentView.layoutMarginsGuide.bottomAnchor),
-            companyCellLogo.heightAnchor.constraint(equalToConstant: 90),
-            companyCellLogo.widthAnchor.constraint(equalToConstant: 90),
+            companyCellLogo.topAnchor.constraint(equalTo: self.contentView.topAnchor),
             
-            companyCellLabel.topAnchor.constraint(equalTo: self.contentView.layoutMarginsGuide.topAnchor),
-            companyCellLabel.leadingAnchor.constraint(equalTo: companyCellLogo.trailingAnchor),
-            companyCellLabel.trailingAnchor.constraint(equalTo: self.contentView.layoutMarginsGuide.trailingAnchor),
-            companyCellLabel.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor),
+            companyCellLogo.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor),
+            
+            companyCellLogo.trailingAnchor.constraint(equalTo: companyCellLabel.leadingAnchor),
+            
+            companyCellLogo.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor),
+            
+            
+            companyCellLabel.topAnchor.constraint(equalTo: self.contentView.topAnchor),
+            companyCellLabel.leadingAnchor.constraint(equalTo: companyCellLogo.trailingAnchor)
+            
+            
             
         ])
         
         
     }
+}
+
+
+extension UIImage {
+
+func resize(targetSize: CGSize) -> UIImage {
+    return UIGraphicsImageRenderer(size:targetSize).image { _ in
+        self.draw(in: CGRect(origin: .zero, size: targetSize))
+    }
+}
+
 }

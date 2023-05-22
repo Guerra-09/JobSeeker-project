@@ -7,7 +7,7 @@ final class ListPresenter {
     private var listCategory: CategoryService?
     private var listOffers: JobOffersService?
     
-    init(listCompany: CompanyService? = nil, listCategory: CategoryService? = nil, listOffers: JobOffersService? = nil) {
+    init(listCompany: CompanyService, listCategory: CategoryService, listOffers: JobOffersService) {
         self.listCompany = listCompany
         self.listCategory = listCategory
         self.listOffers = listOffers
@@ -18,7 +18,9 @@ final class ListPresenter {
     }
     
     func showCompanyList() {
-        self.listCompany?.fetchingAPIData(completionHandler: { [weak self] model, Error  in
+        self.listCompany?.fetchingAPIData(completionHandler: { [weak self] model, error  in
+            
+
             
             if let model = model  {
                 self?.view?.listSuccess(model: model.data)

@@ -143,8 +143,10 @@ class OfferDetailsViewController: UIViewController {
         self.setUpSeniorityLevel()
         self.setUpCompanyLogo()
         self.setUpJobType(modalityId: self.jobInfo?.modality.id ?? 0)
-        self.setUpRemoteModality(modalidad: "\(self.jobInfo?.remoteModality)")
+        self.setUpRemoteModality(modalidad: "\(self.jobInfo?.remoteModality ?? "")")
         self.setUpDescription()
+        
+        
     }
     
     func setUpCompanyName() {
@@ -241,7 +243,6 @@ class OfferDetailsViewController: UIViewController {
     
     func setUpCompanyLogo() {
         
-        
         if let logoUrl = self.jobInfo?.company.logo  {
             companyLogo.load(urlRequest: logoUrl)
         } else {
@@ -252,6 +253,8 @@ class OfferDetailsViewController: UIViewController {
     func setUpDescription() {
         // Setting up requirements of the job
         descriptionLabel.text = "Requerimientos del cargo:\n\n\(self.jobInfo?.description.htmlToString ?? "null")"
+        
+        print("sin conversion: \(self.jobInfo?.description)\n con: \(self.jobInfo?.description.htmlToString)")
     }
     
     

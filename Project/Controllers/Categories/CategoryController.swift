@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Foundation
 
 class CategoryController: UIViewController {
     
@@ -74,8 +75,6 @@ class CategoryController: UIViewController {
     }
     
     
-    
-    
 }
 
 
@@ -112,6 +111,7 @@ extension CategoryController: UITableViewDataSource {
         let categoryModel = self.model
         
         if let categoryModel = categoryModel {
+
             cell.textLabel?.text = "\(categoryModel[indexPath.row].name)"
             spinnerView.stopAnimating()
             

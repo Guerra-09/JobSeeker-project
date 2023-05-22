@@ -35,14 +35,10 @@ class CompanyController: UIViewController {
     
     
     // MARK: - LifeCycle
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBlue
-     
-        self.loadApi()
         self.setupUI()
-        
         
         self.tableView.delegate = self
         self.tableView.dataSource = self
@@ -60,22 +56,6 @@ class CompanyController: UIViewController {
     
     
     // MARK: - Setup UI
-    
-    private func loadApi() {
-
-        let api = CompanyUseCase(companyApi: CompanyService())
-
-            api.requestData { model, error in
-            if let error = error {
-                print(error)
-            } else {
-                guard let modelData = model else { return }
-                self.model = modelData.data
-                self.tableView.reloadData()
-            }
-        }
-    }
-    
     private func setupUI() {
         self.view.backgroundColor = .systemBlue
         
@@ -96,6 +76,10 @@ class CompanyController: UIViewController {
 }
 
 extension CompanyController: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        120
+    }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let model = model else { return }
@@ -127,9 +111,10 @@ extension CompanyController: UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CompanyCell.identifier, for: indexPath) as? CompanyCell else {
             fatalError("ERROR: problema con el uitableviewcell")
         }
-            
+   
         
-        cell.configure(with: "\(self.model?[indexPath.row].logo ?? "aaa")", and: "\(self.model?[indexPath.row].name ?? "nombre = null")")
+        
+        cell.configure(url: "\(self.model?[indexPath.row].logo ?? "")", and: "\(self.model?[indexPath.row].name ?? "nombre = null")")
         
         return cell
     }

@@ -8,7 +8,15 @@
 import Foundation
 import UIKit
 
-class OfferViewController: UIViewController {
+class OfferViewController: UIViewController, UISearchResultsUpdating {
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        guard let text = searchController.searchBar.text else {
+            return
+        }
+        print(text)
+    }
+    
     
     
     // MARK: - Variables
@@ -29,6 +37,10 @@ class OfferViewController: UIViewController {
     
     // MARK: - Components
     
+    let searchController = UISearchController()
+    
+    
+    
     private let offerTableView: UITableView = {
         let tableView = UITableView()
         tableView.backgroundColor = .systemBackground
@@ -45,6 +57,8 @@ class OfferViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+
+        
         navigationItem.title = self.jobTitle
         
         DispatchQueue.main.async { [weak self] in
@@ -53,6 +67,7 @@ class OfferViewController: UIViewController {
         }
         
         self.setUpView()
+        self.setupSearchController()
         
     }
     
@@ -106,14 +121,54 @@ class OfferViewController: UIViewController {
         return imageFinal
     }
     
+}
+
+
+// MARK: - Search functions
+extension OfferViewController {
     
     
     
+    private func setupSearchController() {
+        self.searchController.searchResultsUpdater = self
+        self.searchController.searchBar.placeholder = "Search with keyword"
+        self.navigationItem.searchController = searchController
+    }
+    
+    public func updateSearchController(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        
+        var filteredData: [JobOfferModel]?
+        
+        DispatchQueue.main.async {
+            filteredData = self.model
+        }
+        
+        filteredData = []
+        
+        if searchText == "" {
+            filteredData = self.model
+        }
+        
+        for word in self.model! {
+            
+            if word.title.uppercased().contains(searchText.uppercased()) {
+                filteredData?.append(word)
+            }
+            
+            self.offerTableView.reloadData()
+            
+        }
+    }
+
 }
 
 
 
+
+// MARK: - UITable Protocols
+
 extension OfferViewController: UITableViewDelegate {
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.model?.count ?? 0
     }

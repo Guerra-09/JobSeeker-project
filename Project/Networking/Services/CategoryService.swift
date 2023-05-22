@@ -10,10 +10,8 @@ import Alamofire
 
 class CategoryService {
     
-    var categoryDelegate: ListPresenter?
-    
     func fetchCategories(completionHandler: @escaping (CategoryHandler?, Error?) -> Void) {
-        let url = "https://www.getonbrd.com/api/v0/categories?per_page=20&page=1"
+        let url = "https://www.getonbrd.com/api/v0/categories?per_page=30&page=1"
         
         AF.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: nil, interceptor: nil).response { response in
             

@@ -1,10 +1,3 @@
-//
-//  CompanyModels.swift
-//  Project
-//
-//  Created by José Guerra on 21-03-23.
-//
-
 import Foundation
 
 struct CompanyHandler: Codable {
@@ -19,11 +12,11 @@ struct CompanyModel: Codable {
     
     // Inside of attributes
     let name: String
-    let description: String
+    let description: String?
     //let projects: String?
     let web: String
     let country: String
-    let logo: String
+    let logo: String?
     
     enum CodingKeys: String, CodingKey {
         case id = "id"
@@ -44,11 +37,11 @@ struct CompanyModel: Codable {
         
         let attributes = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
         self.name = try attributes.decode(String.self, forKey: .name)
-        self.description = try attributes.decode(String.self, forKey: .description)
+        self.description = try attributes.decodeIfPresent(String.self, forKey: .description)
         //self.projects = try attributes.decode(String.self, forKey: .projects)
         self.web = try attributes.decode(String.self, forKey: .web)
         self.country = try attributes.decode(String.self, forKey: .country)
-        self.logo = try attributes.decode(String.self, forKey: .logo)
+        self.logo = try attributes.decodeIfPresent(String.self, forKey: .logo)
         
     }
     
